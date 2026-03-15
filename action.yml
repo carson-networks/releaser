@@ -1,0 +1,40 @@
+name: "Releaser"
+description: "Creates a version tag and GitHub Release based on PR labels (release:major, release:minor, release:patch)."
+
+inputs:
+  github_token:
+    description: "GitHub token with contents: write permission to create tags and releases."
+    required: true
+  default_bump:
+    description: >
+      Bump to apply when no PR since the last tag carries a release label.
+      Accepted values: patch, minor, major, none.
+      Use none to skip creating a release entirely.
+    required: false
+    default: "patch"
+  ref:
+    description: "Commit SHA to tag. Defaults to the SHA that triggered the workflow (github.sha)."
+    required: false
+    default: ""
+  base_branch:
+    description: "Branch whose merged PRs are included in the changelog."
+    required: false
+    default: "master"
+  draft_release:
+    description: "Set to 'true' to create a draft release instead of publishing immediately."
+    required: false
+    default: "false"
+
+outputs:
+  version:
+    description: "The new version string without a leading v, e.g. 1.2.3."
+  tag_name:
+    description: "The Git tag that was created, e.g. v1.2.3."
+  release_id:
+    description: "The numeric GitHub Release ID."
+  release_url:
+    description: "The HTML URL of the created GitHub Release."
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
