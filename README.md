@@ -14,38 +14,68 @@ and publishes a release with a generated changelog.
 
 ### Example workflow
 
+A typical setup runs CI first and releases only after it passes. The release
+job uses `needs: ci` so it only runs on a green build, and the `if` guard
+skips it on pull requests — merges to `master` are the only trigger that
+should produce a release.
+
 ```yaml
-name: Release
+name: CI / Release
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
-
-permissions:
-  contents: write
+  pull_request:
 
 jobs:
-  release:
+  ci:
+    name: Test and build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: carson-networks/releaser@v1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: ci
+    # Only release on pushes to master, not on pull requests.
+    if: github.event_name == 'push'
+
+    # contents: write is required to create tags and GitHub Releases.
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Create release
         id: releaser
+        uses: carson-networks/releaser@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Fall back to a patch bump when no PR carries a release label.
+          # Set to "none" to require an explicit label on every release.
           default_bump: patch
           base_branch: master
-          draft_release: "false"
 
-      - name: Print outputs
+      # This step only runs when a release was actually created.
+      - name: Write job summary
+        if: steps.releaser.outputs.tag_name != ''
         run: |
-          echo "version:     ${{ steps.releaser.outputs.version }}"
-          echo "tag:         ${{ steps.releaser.outputs.tag_name }}"
-          echo "release_id:  ${{ steps.releaser.outputs.release_id }}"
-          echo "release_url: ${{ steps.releaser.outputs.release_url }}"
+          echo "## Released ${{ steps.releaser.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[${{ steps.releaser.outputs.release_url }}](${{ steps.releaser.outputs.release_url }})" >> $GITHUB_STEP_SUMMARY
 ```
 
 ## Inputs
