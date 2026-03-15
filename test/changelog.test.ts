@@ -123,7 +123,7 @@ describe("formatPRLine", () => {
 
 describe("generateChangelog", () => {
   it("produces correct output for an empty PR list", () => {
-    expect(generateChangelog([])).toBe("## What's Changed\n\nNo changes.");
+    expect(generateChangelog([])).toBe("## Merged PRs\n\nNo PRs merged.");
   });
 
   it("produces correct output for a single PR", () => {
@@ -134,7 +134,7 @@ describe("generateChangelog", () => {
       author: "dev",
     });
     expect(generateChangelog([pr])).toBe(
-      "## What's Changed\n\n" +
+      "## Merged PRs\n\n" +
         "- Solo change ([#5](https://github.com/owner/repo/pull/5)) by @dev"
     );
   });
@@ -161,7 +161,7 @@ describe("generateChangelog", () => {
       }),
     ];
     expect(generateChangelog(prs)).toBe(
-      "## What's Changed\n\n" +
+      "## Merged PRs\n\n" +
         "- First ([#1](https://github.com/owner/repo/pull/1)) by @alice\n" +
         "- Second ([#2](https://github.com/owner/repo/pull/2)) by @bob\n" +
         "- Third ([#3](https://github.com/owner/repo/pull/3)) by @carol"
@@ -176,7 +176,7 @@ describe("generateChangelog", () => {
       author: "user_name",
     });
     expect(generateChangelog([pr])).toBe(
-      "## What's Changed\n\n" +
+      "## Merged PRs\n\n" +
         "- Fix \\[issue\\] with \\*stuff\\* ([#7](https://github.com/owner/repo/pull/7)) by @user\\_name"
     );
   });

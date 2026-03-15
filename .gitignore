@@ -1,8 +1,11 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Intermediate tsc output used by the bundle step — never committed.
+.tsc-out/
+
+# dist/index.js and dist/index.js.map are committed — the rollup bundle is
+# the action entrypoint that GitHub runs directly.
 
 # Lockfile (optional: some prefer to commit pnpm-lock.yaml)
 # pnpm-lock.yaml

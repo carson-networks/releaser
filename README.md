@@ -138,7 +138,7 @@ permissions:
 The release body lists every merged PR since the last tag, oldest first:
 
 ```markdown
-## What's Changed
+## Merged PRs
 
 - Fix login redirect ([#42](https://github.com/org/repo/pull/42)) by @alice
 - Add dark mode ([#43](https://github.com/org/repo/pull/43)) by @bob

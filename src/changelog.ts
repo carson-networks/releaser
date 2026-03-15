@@ -32,18 +32,18 @@ export function formatPRLine(pr: PR): string {
  * Generates a Markdown release body from a list of merged PRs.
  *
  * Format:
- *   ## What's Changed
+ *   ## Merged PRs
  *   - <title> ([#<number>](<url>)) by @<author>
  *   ...
  *
- * If the PR list is empty, a "No changes" note is included instead of the
+ * If the PR list is empty, a "No PRs merged" note is included instead of the
  * PR list. Callers should still choose whether to publish such a release.
  */
 export function generateChangelog(prs: PR[]): string {
-  const header = "## What's Changed";
+  const header = "## Merged PRs";
 
   if (prs.length === 0) {
-    return `${header}\n\nNo changes.`;
+    return `${header}\n\nNo PRs merged.`;
   }
 
   const lines = prs.map(formatPRLine).join("\n");
