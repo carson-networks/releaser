@@ -77,13 +77,13 @@ jobs:
 
 ## Inputs
 
-| Input           | Required | Default      | Description                                                                                                                                                              |
-| --------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Input           | Required | Default                | Description                                                                                                                                                                         |
+| --------------- | -------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `github_token`  | No       | `GITHUB_TOKEN` env var | GitHub token with `contents: write` permission. Defaults to the `GITHUB_TOKEN` automatically provided by GitHub Actions. Only set this if you need a PAT with elevated permissions. |
-| `default_bump`  | No       | `patch`      | Bump to apply when no merged PR carries a release label. One of `patch`, `minor`, `major`, `none`. Use `none` to skip releasing entirely when there are no labelled PRs. |
-| `ref`           | No       | `github.sha` | Commit SHA to tag. Defaults to the SHA that triggered the workflow.                                                                                                      |
-| `base_branch`   | No       | `master`     | Branch whose merged PRs are scanned for release labels and included in the changelog.                                                                                    |
-| `draft_release` | No       | `false`      | Set to `"true"` to create a draft release instead of publishing immediately.                                                                                             |
+| `default_bump`  | No       | `patch`                | Bump to apply when no merged PR carries a release label. One of `patch`, `minor`, `major`, `none`. Use `none` to skip releasing entirely when there are no labelled PRs.            |
+| `ref`           | No       | `github.sha`           | Commit SHA to tag. Defaults to the SHA that triggered the workflow.                                                                                                                 |
+| `base_branch`   | No       | `master`               | Branch whose merged PRs are scanned for release labels and included in the changelog.                                                                                               |
+| `draft_release` | No       | `false`                | Set to `"true"` to create a draft release instead of publishing immediately.                                                                                                        |
 
 ## Outputs
 

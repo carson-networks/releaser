@@ -6,8 +6,7 @@ import { generateChangelog } from "./changelog.js";
 import { createTagAndRelease } from "./release.js";
 
 async function run(): Promise<void> {
-  const token =
-    core.getInput("github_token") || process.env.GITHUB_TOKEN || "";
+  const token = core.getInput("github_token") || process.env.GITHUB_TOKEN || "";
   if (!token) {
     core.setFailed(
       "No token found. Pass github_token as an input or ensure GITHUB_TOKEN is set."
