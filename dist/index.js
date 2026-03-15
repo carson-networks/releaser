@@ -28054,12 +28054,6 @@ var ExitCode;
  */
 function getInput(name, options) {
     const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
-    if (options && options.required && !val) {
-        throw new Error(`Input required and not supplied: ${name}`);
-    }
-    if (options && options.trimWhitespace === false) {
-        return val;
-    }
     return val.trim();
 }
 /**
@@ -36039,7 +36033,11 @@ async function createTagAndRelease(client, input) {
 }
 
 async function run() {
-    const token = getInput("github_token", { required: true });
+    const token = getInput("github_token") || process.env.GITHUB_TOKEN || "";
+    if (!token) {
+        setFailed("No token found. Pass github_token as an input or ensure GITHUB_TOKEN is set.");
+        return;
+    }
     const defaultBumpRaw = getInput("default_bump") || "patch";
     const refInput = getInput("ref");
     const baseBranch = getInput("base_branch") || "master";
