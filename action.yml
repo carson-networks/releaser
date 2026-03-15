@@ -5,9 +5,10 @@ inputs:
   github_token:
     description: >
       GitHub token with contents: write permission to create tags and releases.
-      Defaults to the GITHUB_TOKEN environment variable automatically provided
-      by GitHub Actions — only set this if you need a PAT with elevated permissions.
+      Defaults to the built-in github.token — only set this if you need a PAT
+      with elevated permissions.
     required: false
+    default: ${{ github.token }}
   default_bump:
     description: >
       Bump to apply when no PR since the last tag carries a release label.
