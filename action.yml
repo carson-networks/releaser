@@ -39,6 +39,10 @@ outputs:
   release_url:
     description: "The HTML URL of the created GitHub Release."
 
+# Required permissions:
+#   contents: write      — create Git tags and GitHub Releases
+#   pull-requests: read  — list merged PRs to build the changelog
+
 runs:
   using: "node20"
   main: "dist/index.js"

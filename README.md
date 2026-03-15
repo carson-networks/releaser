@@ -50,9 +50,9 @@ jobs:
     # Only release on pushes to master, not on pull requests.
     if: github.event_name == 'push'
 
-    # contents: write is required to create tags and GitHub Releases.
     permissions:
-      contents: write
+      contents: write # create Git tags and GitHub Releases
+      pull-requests: read # list merged PRs to build the changelog
 
     steps:
       - uses: actions/checkout@v6
@@ -123,11 +123,12 @@ When no semver tag exists yet, the first version is derived from `default_bump`:
 
 ## Permissions
 
-The workflow job needs `contents: write` to create tags and releases:
+The workflow job needs two permissions:
 
 ```yaml
 permissions:
-  contents: write
+  contents: write # create Git tags and GitHub Releases
+  pull-requests: read # list merged PRs to build the changelog
 ```
 
 ## Changelog format

@@ -10,7 +10,8 @@ jobs:
     name: Tag and release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # create tags and GitHub Releases
+      pull-requests: read # list merged PRs for the changelog
 
     steps:
       - uses: actions/checkout@v6
