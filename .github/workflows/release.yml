@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    name: Tag and release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Create release
+        id: releaser
+        uses: ./
+        with:
+          default_bump: patch
+          base_branch: master
+          draft_release: "false"
+
+      - name: Write job summary
+        if: steps.releaser.outputs.tag_name != ''
+        run: |
+          echo "## Released ${{ steps.releaser.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[${{ steps.releaser.outputs.release_url }}](${{ steps.releaser.outputs.release_url }})" >> $GITHUB_STEP_SUMMARY
