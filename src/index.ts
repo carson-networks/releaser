@@ -1,6 +1,6 @@
 /**
  * Releaser GitHub Action entrypoint.
- * Phase 1: scaffold only — no implementation.
+ * Phase 2: version logic in place; action wiring in Phase 6.
  */
 
 export {};
