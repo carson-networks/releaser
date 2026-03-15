@@ -58,7 +58,9 @@ describe("escapeMd", () => {
   });
 
   it("escapes multiple special characters in a single string", () => {
-    expect(escapeMd("**[fix]** `patch`")).toBe("\\*\\*\\[fix\\]\\*\\* \\`patch\\`");
+    expect(escapeMd("**[fix]** `patch`")).toBe(
+      "\\*\\*\\[fix\\]\\*\\* \\`patch\\`"
+    );
   });
 
   it("handles an empty string", () => {
@@ -85,7 +87,9 @@ describe("formatPRLine", () => {
 
   it("escapes special characters in the title", () => {
     const pr = makePR({ title: "Fix `null` dereference in **core**" });
-    expect(formatPRLine(pr)).toContain("Fix \\`null\\` dereference in \\*\\*core\\*\\*");
+    expect(formatPRLine(pr)).toContain(
+      "Fix \\`null\\` dereference in \\*\\*core\\*\\*"
+    );
   });
 
   it("escapes special characters in the author name", () => {
@@ -94,8 +98,13 @@ describe("formatPRLine", () => {
   });
 
   it("includes PR number as a link", () => {
-    const pr = makePR({ number: 99, url: "https://github.com/org/repo/pull/99" });
-    expect(formatPRLine(pr)).toContain("[#99](https://github.com/org/repo/pull/99)");
+    const pr = makePR({
+      number: 99,
+      url: "https://github.com/org/repo/pull/99",
+    });
+    expect(formatPRLine(pr)).toContain(
+      "[#99](https://github.com/org/repo/pull/99)"
+    );
   });
 
   it("prefixes the line with a dash", () => {
@@ -114,9 +123,7 @@ describe("formatPRLine", () => {
 
 describe("generateChangelog", () => {
   it("produces correct output for an empty PR list", () => {
-    expect(generateChangelog([])).toBe(
-      "## What's Changed\n\nNo changes."
-    );
+    expect(generateChangelog([])).toBe("## What's Changed\n\nNo changes.");
   });
 
   it("produces correct output for a single PR", () => {
@@ -128,21 +135,36 @@ describe("generateChangelog", () => {
     });
     expect(generateChangelog([pr])).toBe(
       "## What's Changed\n\n" +
-      "- Solo change ([#5](https://github.com/owner/repo/pull/5)) by @dev"
+        "- Solo change ([#5](https://github.com/owner/repo/pull/5)) by @dev"
     );
   });
 
   it("produces correct output for multiple PRs in order", () => {
     const prs = [
-      makePR({ number: 1, title: "First",  url: "https://github.com/owner/repo/pull/1",  author: "alice" }),
-      makePR({ number: 2, title: "Second", url: "https://github.com/owner/repo/pull/2",  author: "bob" }),
-      makePR({ number: 3, title: "Third",  url: "https://github.com/owner/repo/pull/3",  author: "carol" }),
+      makePR({
+        number: 1,
+        title: "First",
+        url: "https://github.com/owner/repo/pull/1",
+        author: "alice",
+      }),
+      makePR({
+        number: 2,
+        title: "Second",
+        url: "https://github.com/owner/repo/pull/2",
+        author: "bob",
+      }),
+      makePR({
+        number: 3,
+        title: "Third",
+        url: "https://github.com/owner/repo/pull/3",
+        author: "carol",
+      }),
     ];
     expect(generateChangelog(prs)).toBe(
       "## What's Changed\n\n" +
-      "- First ([#1](https://github.com/owner/repo/pull/1)) by @alice\n" +
-      "- Second ([#2](https://github.com/owner/repo/pull/2)) by @bob\n" +
-      "- Third ([#3](https://github.com/owner/repo/pull/3)) by @carol"
+        "- First ([#1](https://github.com/owner/repo/pull/1)) by @alice\n" +
+        "- Second ([#2](https://github.com/owner/repo/pull/2)) by @bob\n" +
+        "- Third ([#3](https://github.com/owner/repo/pull/3)) by @carol"
     );
   });
 
@@ -155,7 +177,7 @@ describe("generateChangelog", () => {
     });
     expect(generateChangelog([pr])).toBe(
       "## What's Changed\n\n" +
-      "- Fix \\[issue\\] with \\*stuff\\* ([#7](https://github.com/owner/repo/pull/7)) by @user\\_name"
+        "- Fix \\[issue\\] with \\*stuff\\* ([#7](https://github.com/owner/repo/pull/7)) by @user\\_name"
     );
   });
 });

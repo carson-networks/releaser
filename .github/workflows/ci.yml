@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  ci:
+    name: Lint, test, and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build (type-check)
+        run: pnpm build
+
+      - name: Bundle
+        run: pnpm bundle
+
+      - name: Check bundle is up to date
+        run: |
+          if ! git diff --exit-code dist/index.js; then
+            echo "::error::dist/index.js is out of date. Run 'pnpm bundle' and commit the result."
+            exit 1
+          fi

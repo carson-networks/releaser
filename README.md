@@ -50,29 +50,29 @@ jobs:
 
 ## Inputs
 
-| Input | Required | Default | Description |
-|---|---|---|---|
-| `github_token` | Yes | — | GitHub token with `contents: write` permission. Use `secrets.GITHUB_TOKEN` or a PAT. |
-| `default_bump` | No | `patch` | Bump to apply when no merged PR carries a release label. One of `patch`, `minor`, `major`, `none`. Use `none` to skip releasing entirely when there are no labelled PRs. |
-| `ref` | No | `github.sha` | Commit SHA to tag. Defaults to the SHA that triggered the workflow. |
-| `base_branch` | No | `master` | Branch whose merged PRs are scanned for release labels and included in the changelog. |
-| `draft_release` | No | `false` | Set to `"true"` to create a draft release instead of publishing immediately. |
+| Input           | Required | Default      | Description                                                                                                                                                              |
+| --------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `github_token`  | Yes      | —            | GitHub token with `contents: write` permission. Use `secrets.GITHUB_TOKEN` or a PAT.                                                                                     |
+| `default_bump`  | No       | `patch`      | Bump to apply when no merged PR carries a release label. One of `patch`, `minor`, `major`, `none`. Use `none` to skip releasing entirely when there are no labelled PRs. |
+| `ref`           | No       | `github.sha` | Commit SHA to tag. Defaults to the SHA that triggered the workflow.                                                                                                      |
+| `base_branch`   | No       | `master`     | Branch whose merged PRs are scanned for release labels and included in the changelog.                                                                                    |
+| `draft_release` | No       | `false`      | Set to `"true"` to create a draft release instead of publishing immediately.                                                                                             |
 
 ## Outputs
 
-| Output | Description |
-|---|---|
-| `version` | New version without a leading `v`, e.g. `1.2.3`. |
-| `tag_name` | Git tag created, e.g. `v1.2.3`. |
-| `release_id` | Numeric GitHub Release ID. |
-| `release_url` | HTML URL of the created GitHub Release. |
+| Output        | Description                                      |
+| ------------- | ------------------------------------------------ |
+| `version`     | New version without a leading `v`, e.g. `1.2.3`. |
+| `tag_name`    | Git tag created, e.g. `v1.2.3`.                  |
+| `release_id`  | Numeric GitHub Release ID.                       |
+| `release_url` | HTML URL of the created GitHub Release.          |
 
 ## Label semantics
 
 Add one of these labels to a PR before merging it:
 
-| Label | Effect |
-|---|---|
+| Label           | Effect                                            |
+| --------------- | ------------------------------------------------- |
 | `release:major` | Bumps the major version (e.g. `1.2.3` → `2.0.0`). |
 | `release:minor` | Bumps the minor version (e.g. `1.2.3` → `1.3.0`). |
 | `release:patch` | Bumps the patch version (e.g. `1.2.3` → `1.2.4`). |
@@ -87,12 +87,12 @@ is used. Setting it to `none` causes the action to exit without creating a relea
 
 When no semver tag exists yet, the first version is derived from `default_bump`:
 
-| `default_bump` | First version |
-|---|---|
-| `patch` | `v0.0.1` |
-| `minor` | `v0.1.0` |
-| `major` | `v1.0.0` |
-| `none` | *(no release created)* |
+| `default_bump` | First version          |
+| -------------- | ---------------------- |
+| `patch`        | `v0.0.1`               |
+| `minor`        | `v0.1.0`               |
+| `major`        | `v1.0.0`               |
+| `none`         | _(no release created)_ |
 
 ## Permissions
 

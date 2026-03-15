@@ -7,7 +7,8 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "tsc",
-    "bundle": "ncc build src/index.ts -o dist --license licenses.txt",
+    "clean": "rm -rf dist",
+    "bundle": "pnpm clean && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
@@ -24,7 +25,7 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",
-    "@vercel/ncc": "^0.38.4",
+    "esbuild": "^0.27.4",
     "eslint": "^10.0.3",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",

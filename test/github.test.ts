@@ -26,7 +26,8 @@ function makePR(
     number: overrides.number ?? 1,
     title: overrides.title ?? "Fix bug",
     html_url: overrides.html_url ?? "https://github.com/owner/repo/pull/1",
-    merged_at: "merged_at" in overrides ? overrides.merged_at : "2024-02-01T00:00:00Z",
+    merged_at:
+      "merged_at" in overrides ? overrides.merged_at : "2024-02-01T00:00:00Z",
     user: overrides.user !== undefined ? overrides.user : { login: "alice" },
     labels: overrides.labels ?? [],
   };
@@ -42,8 +43,10 @@ function makeClient(overrides: {
   // Both getLatestSemverTag and getMergedPRsSince use client.paginate (not
   // paginate.iterator), so a single paginate mock handles both.
   const paginateFn = vi.fn((endpoint: unknown) => {
-    if (endpoint === "repos.listTags") return Promise.resolve(overrides.listTags ?? []);
-    if (endpoint === "pulls.list") return Promise.resolve(overrides.listPulls ?? []);
+    if (endpoint === "repos.listTags")
+      return Promise.resolve(overrides.listTags ?? []);
+    if (endpoint === "pulls.list")
+      return Promise.resolve(overrides.listPulls ?? []);
     return Promise.resolve([]);
   });
 
@@ -58,9 +61,21 @@ function makeClient(overrides: {
       repos: { listTags: "repos.listTags" },
       pulls: { list: "pulls.list" },
       git: {
-        getRef: vi.fn().mockResolvedValue(overrides.getRef ?? { data: { object: { type: "commit", sha: "abc" } } }),
-        getCommit: vi.fn().mockResolvedValue(overrides.getCommit ?? { data: { committer: { date: "2024-01-15T00:00:00Z" } } }),
-        getTag: vi.fn().mockResolvedValue(overrides.getTag ?? { data: { tagger: { date: "2024-01-15T00:00:00Z" } } }),
+        getRef: vi.fn().mockResolvedValue(
+          overrides.getRef ?? {
+            data: { object: { type: "commit", sha: "abc" } },
+          }
+        ),
+        getCommit: vi.fn().mockResolvedValue(
+          overrides.getCommit ?? {
+            data: { committer: { date: "2024-01-15T00:00:00Z" } },
+          }
+        ),
+        getTag: vi.fn().mockResolvedValue(
+          overrides.getTag ?? {
+            data: { tagger: { date: "2024-01-15T00:00:00Z" } },
+          }
+        ),
       },
     },
   } as unknown as Octokit;
@@ -96,7 +111,9 @@ describe("getLatestSemverTag", () => {
   });
 
   it("returns null when all tags are non-semver", async () => {
-    const client = makeClient({ listTags: [{ name: "latest" }, { name: "stable" }] });
+    const client = makeClient({
+      listTags: [{ name: "latest" }, { name: "stable" }],
+    });
     expect(await getLatestSemverTag(client, "owner", "repo")).toBeNull();
   });
 
@@ -148,12 +165,17 @@ describe("getMergedPRsSince", () => {
   it("excludes PRs merged before or at the since date", async () => {
     const client = makeClient({
       listPulls: [
-        makePR({ number: 1, merged_at: "2024-01-01T00:00:00Z" }),  // before → excluded
-        makePR({ number: 2, merged_at: "2024-01-15T00:00:00Z" }),  // equal to since → excluded
-        makePR({ number: 3, merged_at: "2024-02-01T00:00:00Z" }),  // after → included
+        makePR({ number: 1, merged_at: "2024-01-01T00:00:00Z" }), // before → excluded
+        makePR({ number: 2, merged_at: "2024-01-15T00:00:00Z" }), // equal to since → excluded
+        makePR({ number: 3, merged_at: "2024-02-01T00:00:00Z" }), // after → included
       ],
     });
-    const prs = await getMergedPRsSince(client, "owner", "repo", "2024-01-15T00:00:00Z");
+    const prs = await getMergedPRsSince(
+      client,
+      "owner",
+      "repo",
+      "2024-01-15T00:00:00Z"
+    );
     expect(prs).toHaveLength(1);
     expect(prs[0].number).toBe(3);
   });
@@ -206,21 +228,24 @@ describe("getMergedPRsSince", () => {
     // `base` param is forwarded to `paginate` by checking the call args.
     const client = makeClient({ listPulls: [] });
     await getMergedPRsSince(client, "owner", "repo", null, "main");
-    const [, callArgs] = (client.paginate as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [, callArgs] = (client.paginate as ReturnType<typeof vi.fn>).mock
+      .calls[0];
     expect(callArgs).toMatchObject({ base: "main" });
   });
 
   it("defaults baseBranch to master", async () => {
     const client = makeClient({ listPulls: [] });
     await getMergedPRsSince(client, "owner", "repo", null);
-    const [, callArgs] = (client.paginate as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [, callArgs] = (client.paginate as ReturnType<typeof vi.fn>).mock
+      .calls[0];
     expect(callArgs).toMatchObject({ base: "master" });
   });
 
   it("sorts by created not updated so post-merge edits do not affect ordering", async () => {
     const client = makeClient({ listPulls: [] });
     await getMergedPRsSince(client, "owner", "repo", null);
-    const [, callArgs] = (client.paginate as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [, callArgs] = (client.paginate as ReturnType<typeof vi.fn>).mock
+      .calls[0];
     expect(callArgs).toMatchObject({ sort: "created" });
   });
 });
@@ -239,7 +264,12 @@ describe("getReleaseContext", () => {
       listTags: [],
       listPulls: [makePR({ number: 1, labels: [{ name: "release:patch" }] })],
     });
-    const ctx = await getReleaseContext(client, "owner", "repo", BumpType.Patch);
+    const ctx = await getReleaseContext(
+      client,
+      "owner",
+      "repo",
+      BumpType.Patch
+    );
     expect(ctx.latestTag).toBeNull();
     expect(ctx.mergedPRs).toHaveLength(1);
   });
@@ -249,7 +279,12 @@ describe("getReleaseContext", () => {
       listTags: [],
       listPulls: [makePR({ labels: [{ name: "release:minor" }] })],
     });
-    const ctx = await getReleaseContext(client, "owner", "repo", BumpType.Patch);
+    const ctx = await getReleaseContext(
+      client,
+      "owner",
+      "repo",
+      BumpType.Patch
+    );
     expect(ctx.bump).toBe(BumpType.Minor);
   });
 
@@ -258,7 +293,12 @@ describe("getReleaseContext", () => {
       listTags: [],
       listPulls: [makePR({ labels: [{ name: "bug" }] })],
     });
-    const ctx = await getReleaseContext(client, "owner", "repo", BumpType.Major);
+    const ctx = await getReleaseContext(
+      client,
+      "owner",
+      "repo",
+      BumpType.Major
+    );
     expect(ctx.bump).toBe(BumpType.Major);
   });
 
@@ -275,7 +315,12 @@ describe("getReleaseContext", () => {
       getRef: { data: { object: { type: "commit", sha: "abc" } } },
       getCommit: { data: { committer: { date: "2024-01-15T00:00:00Z" } } },
     });
-    const ctx = await getReleaseContext(client, "owner", "repo", BumpType.Patch);
+    const ctx = await getReleaseContext(
+      client,
+      "owner",
+      "repo",
+      BumpType.Patch
+    );
     expect(ctx.latestTag).toBe("v2.0.0");
   });
 
@@ -288,7 +333,12 @@ describe("getReleaseContext", () => {
         makePR({ number: 3, labels: [{ name: "release:patch" }] }),
       ],
     });
-    const ctx = await getReleaseContext(client, "owner", "repo", BumpType.Patch);
+    const ctx = await getReleaseContext(
+      client,
+      "owner",
+      "repo",
+      BumpType.Patch
+    );
     expect(ctx.bump).toBe(BumpType.Minor);
   });
 
@@ -296,9 +346,9 @@ describe("getReleaseContext", () => {
     const client = makeClient({ listTags: [], listPulls: [] });
     await getReleaseContext(client, "owner", "repo", BumpType.Patch, "main");
     // The pulls.list call should have received base: "main"
-    const pullsCall = (client.paginate as ReturnType<typeof vi.fn>).mock.calls.find(
-      ([endpoint]: [unknown]) => endpoint === "pulls.list"
-    );
+    const pullsCall = (
+      client.paginate as ReturnType<typeof vi.fn>
+    ).mock.calls.find(([endpoint]: [unknown]) => endpoint === "pulls.list");
     expect(pullsCall).toBeDefined();
     expect(pullsCall![1]).toMatchObject({ base: "main" });
   });

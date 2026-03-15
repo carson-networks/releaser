@@ -89,7 +89,14 @@ export async function createTagAndRelease(
   const { owner, repo, tagName, sha, body, draft = false } = input;
 
   await createTag(client, owner, repo, tagName, sha);
-  const { id, url } = await createRelease(client, owner, repo, tagName, body, draft);
+  const { id, url } = await createRelease(
+    client,
+    owner,
+    repo,
+    tagName,
+    body,
+    draft
+  );
 
   const version = tagName.startsWith("v") ? tagName.slice(1) : tagName;
 

@@ -25,7 +25,13 @@ async function run(): Promise<void> {
 
   const client = createClient(token);
 
-  const ctx = await getReleaseContext(client, owner, repo, defaultBump, baseBranch);
+  const ctx = await getReleaseContext(
+    client,
+    owner,
+    repo,
+    defaultBump,
+    baseBranch
+  );
 
   if (ctx.bump === "none") {
     core.info("Bump is none — skipping tag and release creation.");

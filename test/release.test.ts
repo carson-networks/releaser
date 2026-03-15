@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { createTag, createRelease, createTagAndRelease } from "../src/release.js";
+import {
+  createTag,
+  createRelease,
+  createTagAndRelease,
+} from "../src/release.js";
 import type { Octokit } from "../src/github.js";
 import type { ReleaseInput } from "../src/release.js";
 
@@ -7,10 +11,12 @@ import type { ReleaseInput } from "../src/release.js";
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeClient(overrides: {
-  createRef?: () => Promise<unknown>;
-  createRelease?: () => Promise<{ data: { id: number; html_url: string } }>;
-} = {}): Octokit {
+function makeClient(
+  overrides: {
+    createRef?: () => Promise<unknown>;
+    createRelease?: () => Promise<{ data: { id: number; html_url: string } }>;
+  } = {}
+): Octokit {
   return {
     rest: {
       git: {
@@ -23,7 +29,10 @@ function makeClient(overrides: {
           overrides.createRelease ??
             (() =>
               Promise.resolve({
-                data: { id: 1, html_url: "https://github.com/owner/repo/releases/tag/v1.0.0" },
+                data: {
+                  id: 1,
+                  html_url: "https://github.com/owner/repo/releases/tag/v1.0.0",
+                },
               }))
         ),
       },
@@ -37,7 +46,9 @@ function makeInput(overrides: Partial<ReleaseInput> = {}): ReleaseInput {
     repo: overrides.repo ?? "repo",
     tagName: overrides.tagName ?? "v1.2.3",
     sha: overrides.sha ?? "abc123",
-    body: overrides.body ?? "## What's Changed\n\n- Fix bug ([#1](https://github.com/owner/repo/pull/1)) by @alice",
+    body:
+      overrides.body ??
+      "## What's Changed\n\n- Fix bug ([#1](https://github.com/owner/repo/pull/1)) by @alice",
     draft: overrides.draft,
   };
 }
@@ -61,16 +72,19 @@ describe("createTag", () => {
   it("uses the full refs/tags/ prefix in the ref", async () => {
     const client = makeClient();
     await createTag(client, "owner", "repo", "v2.0.0", "sha");
-    const [args] = (client.rest.git.createRef as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.git.createRef as ReturnType<typeof vi.fn>).mock
+      .calls[0];
     expect(args.ref).toBe("refs/tags/v2.0.0");
   });
 
   it("propagates errors from the API (e.g. tag already exists)", async () => {
-    const err = Object.assign(new Error("Reference already exists"), { status: 422 });
+    const err = Object.assign(new Error("Reference already exists"), {
+      status: 422,
+    });
     const client = makeClient({ createRef: () => Promise.reject(err) });
-    await expect(createTag(client, "owner", "repo", "v1.0.0", "sha")).rejects.toThrow(
-      "Reference already exists"
-    );
+    await expect(
+      createTag(client, "owner", "repo", "v1.0.0", "sha")
+    ).rejects.toThrow("Reference already exists");
   });
 });
 
@@ -95,14 +109,16 @@ describe("createRelease", () => {
   it("passes draft: true when requested", async () => {
     const client = makeClient();
     await createRelease(client, "owner", "repo", "v1.0.0", "body", true);
-    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>)
+      .mock.calls[0];
     expect(args.draft).toBe(true);
   });
 
   it("defaults draft to false", async () => {
     const client = makeClient();
     await createRelease(client, "owner", "repo", "v1.0.0", "body");
-    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>)
+      .mock.calls[0];
     expect(args.draft).toBe(false);
   });
 
@@ -110,10 +126,19 @@ describe("createRelease", () => {
     const client = makeClient({
       createRelease: () =>
         Promise.resolve({
-          data: { id: 42, html_url: "https://github.com/owner/repo/releases/tag/v1.2.3" },
+          data: {
+            id: 42,
+            html_url: "https://github.com/owner/repo/releases/tag/v1.2.3",
+          },
         }),
     });
-    const result = await createRelease(client, "owner", "repo", "v1.2.3", "body");
+    const result = await createRelease(
+      client,
+      "owner",
+      "repo",
+      "v1.2.3",
+      "body"
+    );
     expect(result).toEqual({
       id: 42,
       url: "https://github.com/owner/repo/releases/tag/v1.2.3",
@@ -138,10 +163,16 @@ describe("createTagAndRelease", () => {
     const client = makeClient({
       createRelease: () =>
         Promise.resolve({
-          data: { id: 99, html_url: "https://github.com/owner/repo/releases/tag/v1.2.3" },
+          data: {
+            id: 99,
+            html_url: "https://github.com/owner/repo/releases/tag/v1.2.3",
+          },
         }),
     });
-    const result = await createTagAndRelease(client, makeInput({ tagName: "v1.2.3", sha: "abc" }));
+    const result = await createTagAndRelease(
+      client,
+      makeInput({ tagName: "v1.2.3", sha: "abc" })
+    );
     expect(result).toEqual({
       version: "1.2.3",
       tagName: "v1.2.3",
@@ -152,14 +183,20 @@ describe("createTagAndRelease", () => {
 
   it("strips the leading v from tagName to produce version", async () => {
     const client = makeClient();
-    const result = await createTagAndRelease(client, makeInput({ tagName: "v2.5.0" }));
+    const result = await createTagAndRelease(
+      client,
+      makeInput({ tagName: "v2.5.0" })
+    );
     expect(result.version).toBe("2.5.0");
     expect(result.tagName).toBe("v2.5.0");
   });
 
   it("does not strip version when tagName has no v prefix", async () => {
     const client = makeClient();
-    const result = await createTagAndRelease(client, makeInput({ tagName: "3.0.0" }));
+    const result = await createTagAndRelease(
+      client,
+      makeInput({ tagName: "3.0.0" })
+    );
     expect(result.version).toBe("3.0.0");
     expect(result.tagName).toBe("3.0.0");
   });
@@ -167,10 +204,18 @@ describe("createTagAndRelease", () => {
   it("calls createTag before createRelease", async () => {
     const callOrder: string[] = [];
     const client = makeClient({
-      createRef: () => { callOrder.push("tag"); return Promise.resolve({}); },
+      createRef: () => {
+        callOrder.push("tag");
+        return Promise.resolve({});
+      },
       createRelease: () => {
         callOrder.push("release");
-        return Promise.resolve({ data: { id: 1, html_url: "https://github.com/owner/repo/releases/tag/v1.0.0" } });
+        return Promise.resolve({
+          data: {
+            id: 1,
+            html_url: "https://github.com/owner/repo/releases/tag/v1.0.0",
+          },
+        });
       },
     });
     await createTagAndRelease(client, makeInput());
@@ -180,7 +225,8 @@ describe("createTagAndRelease", () => {
   it("passes sha to createTag", async () => {
     const client = makeClient();
     await createTagAndRelease(client, makeInput({ sha: "deadbeef123" }));
-    const [args] = (client.rest.git.createRef as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.git.createRef as ReturnType<typeof vi.fn>).mock
+      .calls[0];
     expect(args.sha).toBe("deadbeef123");
   });
 
@@ -188,14 +234,16 @@ describe("createTagAndRelease", () => {
     const client = makeClient();
     const body = "## What's Changed\n\n- My change ([#5](https://url)) by @dev";
     await createTagAndRelease(client, makeInput({ body }));
-    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>)
+      .mock.calls[0];
     expect(args.body).toBe(body);
   });
 
   it("passes draft: true through to createRelease", async () => {
     const client = makeClient();
     await createTagAndRelease(client, makeInput({ draft: true }));
-    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>)
+      .mock.calls[0];
     expect(args.draft).toBe(true);
   });
 
@@ -204,12 +252,15 @@ describe("createTagAndRelease", () => {
     const input = makeInput();
     delete (input as Partial<ReleaseInput>).draft;
     await createTagAndRelease(client, input);
-    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [args] = (client.rest.repos.createRelease as ReturnType<typeof vi.fn>)
+      .mock.calls[0];
     expect(args.draft).toBe(false);
   });
 
   it("propagates tag creation failure without calling createRelease", async () => {
-    const err = Object.assign(new Error("Reference already exists"), { status: 422 });
+    const err = Object.assign(new Error("Reference already exists"), {
+      status: 422,
+    });
     const createReleaseFn = vi.fn();
     const client = makeClient({
       createRef: () => Promise.reject(err),
@@ -224,6 +275,8 @@ describe("createTagAndRelease", () => {
   it("propagates release creation failure", async () => {
     const err = Object.assign(new Error("already_exists"), { status: 422 });
     const client = makeClient({ createRelease: () => Promise.reject(err) });
-    await expect(createTagAndRelease(client, makeInput())).rejects.toThrow("already_exists");
+    await expect(createTagAndRelease(client, makeInput())).rejects.toThrow(
+      "already_exists"
+    );
   });
 });

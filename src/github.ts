@@ -164,7 +164,7 @@ export async function getMergedPRsSince(
         url: raw.html_url,
         author: raw.user?.login ?? "unknown",
         labels: raw.labels.map((l) =>
-          typeof l === "string" ? l : l.name ?? ""
+          typeof l === "string" ? l : (l.name ?? "")
         ),
       },
       mergedAt,
