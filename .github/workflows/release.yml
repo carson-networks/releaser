@@ -20,6 +20,7 @@ jobs:
         id: releaser
         uses: ./
         with:
+          github_token: ${{ secrets.RELEASE_PAT }}
           default_bump: patch
           base_branch: master
           draft_release: "false"
