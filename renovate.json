@@ -4,6 +4,11 @@
   "enabledManagers": ["npm", "github-actions"],
   "packageRules": [
     {
+      "description": "Stay on TypeScript 6; allow 6.x minors and patches, block 7+",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
       "description": "Group TypeScript/npm updates into a single PR",
       "matchManagers": ["npm"],
       "groupName": "typescript dependencies",
