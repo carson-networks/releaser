@@ -4,10 +4,25 @@
   "enabledManagers": ["npm", "github-actions"],
   "packageRules": [
     {
-      "description": "Group TypeScript/npm updates into a single PR",
+      "description": "Stay on TypeScript 6; allow 6.x minors and patches, block 7+",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
+    },
+    {
+      "description": "Group TypeScript/npm updates into a single PR and refresh the committed action bundle",
       "matchManagers": ["npm"],
       "groupName": "typescript dependencies",
-      "separateMajorMinor": false
+      "separateMajorMinor": false,
+      "skipInstalls": false,
+      "postUpgradeTasks": {
+        "commands": ["pnpm install", "pnpm bundle"],
+        "fileFilters": ["dist/**"],
+        "executionMode": "branch",
+        "installTools": {
+          "node": {},
+          "pnpm": {}
+        }
+      }
     },
     {
       "description": "Group GitHub Actions updates into a single PR",
