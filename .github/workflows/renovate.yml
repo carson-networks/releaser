@@ -25,3 +25,5 @@ jobs:
         env:
           LOG_LEVEL: debug
           RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # Global-only allowlist so postUpgradeTasks in renovate.json can rebuild dist/.
+          RENOVATE_ALLOWED_COMMANDS: '["^pnpm install$", "^pnpm bundle$"]'
